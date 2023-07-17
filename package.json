@@ -1,0 +1,33 @@
+{
+  "name": "vantage-bridge",
+  "version": "1.0.0",
+  "description": "Interface for Davis Vantage Pro weather station to the Fatek PLC",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/otaherm/vantage-bridge.git"
+  },
+  "keywords": [
+    "Davis",
+    "Vantage",
+    "Pro",
+    "Fatek",
+    "PLC",
+    "Weather",
+    "temperature"
+  ],
+  "author": "Ota Herm",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/otaherm/vantage-bridge/issues"
+  },
+  "homepage": "https://github.com/otaherm/vantage-bridge#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "crc": "^4.3.2",
+    "serialport": "^11.0.0"
+  }
+}
