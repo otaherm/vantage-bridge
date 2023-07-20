@@ -9,8 +9,7 @@ console.error(ch.blue.bold('Starting vantage-bridge on %s'), conf.port)
 let serialPort = new SerialPort({ path: conf.port, baudRate: 19200, dataBits: 8, parity: 'none' })
 
 let fatek = f.init(conf.plc_protocol, conf.plc_ip, conf.plc_port, conf.plc_station, conf.plc_name)
-console.error('Fatek initialized...', fatek)
-
+console.error('Fatek initialized...')
 
 let recbuf = Buffer.alloc(0)
 
@@ -34,18 +33,12 @@ serialPort.on('open', () => {
         } else if (sendLoop.readLoop) {
             if (recbuf.length < 100) return
 
-
             parseLoop(recbuf)
-
             recbuf = Buffer.alloc(0)
         } else {
             console.error(ch.red('Unknown state...'))
         }
-
     });
-
-
-
 })
 
 let sendLoop = {
@@ -75,7 +68,7 @@ function parseLoop(bfr) {
     //console.error(ch.green('Got LOOP answer(%d):'), recbuf.length, recbuf)
 
     let ack = recbuf.readUInt8(0)
-    if (ack !=ACK) return console.error(ch.red('Failed ACK'))
+    if (ack != ACK) return console.error(ch.red('Failed ACK'))
 
     let ld = recbuf.slice(1) //ld..loop data
     let loo = ld.toString('ascii', 0, 3)
@@ -85,7 +78,6 @@ function parseLoop(bfr) {
     if (n != 10) return console.error(ch.red('Failed end \\n at LOOP (got %d)'), n)
     let r = ld.readUInt8(96)
     if (r != 13) return console.error(ch.red('Failed end \\r at LOOP (got %d)'), r)
-
 
     //TODO: check CRC here
     let temp_inside = ftoc(ld.readInt16LE(9) / 10)
@@ -102,16 +94,14 @@ function parseLoop(bfr) {
     let sunset = ld.readInt16LE(93)
 
     let loopcrc = ld.readUInt16LE(97)
-    let ldshort = ld.slice(0, ld.lenght - 2)
+    let ldshort = ld.slice(0, ld.length - 2)
 
-    let ycrc1 = crc.crc1(ldshort)
+    //let ycrc1 = crc.crc1(ldshort)
+    //console.log('ldshort:',ldshort)
     let ycrc8 = crc.crc8(ldshort)
     let ycrc16 = crc.crc16(ldshort)
     let ycrc24 = crc.crc24(ldshort)
     let ycrc32 = crc.crc32(ldshort)
-
-
-
 
     console.error(ch.green('LOOP OK'))
 
@@ -135,15 +125,15 @@ function parseLoop(bfr) {
     console.log('Sunrise:', sunrise)
     console.log('Sunset:', sunset)
 
-    /*    console.log('CRC:',loopcrc.toString(16))
+        console.log('CRC:',loopcrc.toString(16))
     
-    console.log('CRC1:',ycrc1.toString(16))
+    //console.log('CRC1:',ycrc1.toString(16))
     console.log('CRC8:',ycrc8.toString(16))
     console.log('CRC16:',ycrc16.toString(16))
     console.log('CRC24:',ycrc24.toString(16))
     console.log('CRC32:',ycrc32.toString(16))
-    //console.log('CRC:',crc.toString(16))
-    */
+    console.log('CRC:',crc.toString(16))
+    
     let fields = [
         60, //R900 timeout refresh - decrement in PLC   
         timespec,  //R901 actual time
@@ -163,6 +153,7 @@ function parseLoop(bfr) {
     f.writeContRegs(fatek, 'R900', fields, (err, o) => {
         if (err) console.error(ch.red('Cannot write to Fatek:'), err)
         console.log('Stored to Fatek:', o)
+        f.describeSocetState(fatek)
     })
 }
 
